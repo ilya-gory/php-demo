@@ -1,0 +1,59 @@
+{% set rooms_str = {
+1:'Однокомнатная',
+2:'Двухкомнатная',
+3:'Трёхкомнатная',
+4:'Четырёхкомнатная',
+5:'Пятикомнатная',
+6:'Шестикомнатная',
+7:'Семикомнатная',
+9:'Девятикомнатная'
+} %}
+<div class="row sub_content">
+    <div class="carousel-intro">
+        <div class="col-md-12">
+            <div class="dividerHeading">
+                <h4><span>Похожие квартиры</span></h4>
+
+            </div>
+            <div class="carousel-navi">
+                <div id="work-prev" class="arrow-left jcarousel-prev"><i class="fa fa-angle-left"></i></div>
+                <div id="work-next" class="arrow-right jcarousel-next"><i class="fa fa-angle-right"></i></div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+    <div class="jcarousel recent-work-jc">
+        <ul class="jcarousel-list">
+            <!-- Recent Work Item -->
+            {% for sim in similar %}
+                <li class="col-sm-3 col-md-3 col-lg-3">
+                    <div class="recent-item">
+                        <figure>
+                            <div class="touching medium">
+                                <img src="/image/kv-{{ sim.id }}.jpg" alt="" onerror="imageerror(this)"/>
+                                <div class="hovers">
+                                    <a href="/image-kv-{{ sim.id }}" class="hover-zoom mfp-image">
+                                        <i class="fa fa-search"></i>
+                                    </a>
+                                    <a href="/flat/{{ sim.id }}" class="hover-link"><i class="fa fa-link"></i></a>
+                                </div>
+                            </div>
+                            <figcaption class="item-description">
+                                <h5>{{ rooms_str[sim.rooms] }}</h5>
+                                <span>{{ sim.floor }} этаж № {{ sim.flat_num }}</span><br>
+                                <span>Цена:
+                                    {% if sim.price_m_a %}
+                                        {{ (sim.price_m_a * sim.area_overall + sim.price_add)|number_format(2,',',' ') }}
+                                    {% else %}
+                                        {{ (sim.price_m * sim.area_overall + sim.price_add)|number_format(2,',',' ') }}
+                                    {% endif %}
+                                    руб.</span>
+                            </figcaption>
+                        </figure>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

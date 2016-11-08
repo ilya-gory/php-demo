@@ -1,0 +1,50 @@
+<div id="pop-form">
+    <h1>Задайте вопрос</h1>
+    <p>Узнайте больше о специальных предложениях, условиях оплаты, вариантах отделки</p>
+
+    <p class="alert alert-danger hidden">
+        К сожалению, произошла ошибка и ваш вопрос скорее всего не отправился. Пожалуйста, перезагрузите страницу и
+        попробуйте ещё раз.
+    </p>
+    <p class="alert alert-info hidden">
+        Ваш вопрос отправлен и мы свяжемся с вами как можно скорее. (Это окно закроется автоматически через 2c.)
+    </p>
+
+    <fieldset>
+        <div class="row">
+            <div class="form-group col-md-6 col-sm-6 col-lg-6">
+                <input type="text" name="fname" placeholder="Имя" class="form-control">
+                <p class="help-block hidden" data-f="fname">Это поле нужно заполнить</p>
+            </div>
+            <div class="form-group col-md-6 col-sm-6 col-lg-6">
+                <input type="text" name="lname" placeholder="Фамилия" class="form-control">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-6 col-sm-6 col-lg-6">
+                <input type="text" name="phone" placeholder="Номер телефона" class="form-control">
+                <p class="help-block hidden" data-f="phone">Это поле нужно заполнить</p>
+            </div>
+            <div class="form-group col-md-6 col-sm-6 col-lg-6">
+                <input type="text" name="email" placeholder="E-mail" class="form-control">
+                <p class="help-block hidden" data-f="email">Это поле нужно заполнить</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <textarea name="message" placeholder="Сообщение" class="form-control"></textarea>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-lg-6">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="check">
+                        Я согласен с политикой обработки данных.
+                    </label>
+                </div>
+            </div>
+            <div class="form-group col-md-6 col-sm-6 col-lg-6">
+                <button type="button" class="btn btn-block btn-lg submit" disabled>Отправить</button>
+            </div>
+        </div>
+    </fieldset>
+</div>

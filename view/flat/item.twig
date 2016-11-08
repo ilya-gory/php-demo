@@ -1,0 +1,212 @@
+{% extends "layout_inner.twig" %}
+{% block body_inner %}
+    <section class="wrapper">
+        <section class="page_head">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <h2>{{ flat.rooms }}-комнатная квартира №{{ flat.flat_num }}</h2>
+                        <nav id="breadcrumbs">
+                            <ul>
+                                <li><a href="/">Главная</a></li>
+                                <li><a href="/flat?rooms={{ flat.rooms }}">{{ flat.rooms }}-комнатные квратиры</a></li>
+                                <li>№{{ flat.flat_num }}</li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="container">
+            <div class="row sub_content">
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Статус:</td>
+                            <td class="nowrap hl-{{ statusColors[flat.status_id] }} t-bold">&bull; {{ flat.status }}</td>
+                        </tr>
+                        <tr>
+                            <td>Очередь:</td>
+                            <td>{{ flat.address }}</td>
+                        </tr>
+                        <tr>
+                            <td>Этаж:</td>
+                            <td>{{ flat.floor }}</td>
+
+                        </tr>
+                        <tr>
+                            <td>№ квартиры:</td>
+                            <td>{{ flat.flat_num }}</td>
+
+                        </tr>
+                        <tr>
+                            <td>Площадь общая:</td>
+                            <td>{{ flat.area_overall|number_format(2,',') }} м²</td>
+
+                        </tr>
+                        <tr>
+                            <td>Цена договора:</td>
+                            <td class="nowrap">
+                                {{ (flat.price_m * flat.area_overall + flat.price_add)|number_format(2,',',' ') }}
+                            </td>
+
+                        </tr>
+                        {% if flat.price_m_a %}
+                            <tr>
+                                <td>Цена договора по акции:</td>
+                                <td class="nowrap hl-pink">
+                                    <i class="fa fa-bullhorn"></i>&nbsp;
+                                    {{ (flat.price_m_a * flat.area_overall + flat.price_add)|number_format(2,',',' ') }}
+                                </td>
+                            </tr>
+                        {% endif %}
+                        {% if similar2|length > 0 %}
+                            <tr>
+                                <td>Номера пхожих квартир</td>
+                                <td>
+                                    {{ similar2|join(', ') }}
+                                </td>
+                            </tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-6">
+                    <div class="serviceBox_4">
+                        <div class="service_4_img">
+                            <a href="/image/kv-{{ flat.id }}.jpg" class="mfp-image">
+                                <img alt="" src="/image/kv-{{ flat.id }}.jpg" onerror="imageerror(this)">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-2 col-sm-2">
+                    <div class="serviceBox_4">
+                        <div class="service_4_img">
+                            <a href="/image/gp-{{ flat.address_id }}.jpg" class="mfp-image">
+                                <img alt="" src="/image/gp-{{ flat.address_id }}.jpg" onerror="imageerror(this)">
+                            </a>
+                        </div>
+                    </div>
+
+
+                    <div class="dividerHeading">
+                    </div>
+                    <div class="serviceBox_4">
+                        <div class="service_4_img">
+                            <a href="/image/kv-{{ flat.id }}-floor.jpg" class="mfp-image">
+                                <img alt="" src="/image/kv-{{ flat.id }}-floor.jpg" onerror="imageerror(this)">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row sub_content">
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                    <a href="#pop-form" class="btn btn-default btn-block pop-form">
+                        <i class="fa fa-print"></i>
+                        Печать
+                    </a>
+                </div>
+                {% if similar|length > 0 %}
+                    <div class="col-lg-8 col-md-8 col-sm-8">
+                        <div class="col-lg-12 col-md-12 col-sm-12">{% include "_inc/similar.twig" %}</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block script %}
+    <script type="text/x-handlebars-template" id="pop-form-template">
+        {% include "flat/item/pop_form.twig" %}
+    </script>
+    <script>
+        $(function () {
+            // form handle
+            var hf = function (s) {
+                console.log(s.html());
+                var scope = s;
+                scope.on('change', '[name="check"]', function (e) {
+                    console.log(e);
+                    var isChecked = e.currentTarget.checked;
+                    var submit = $('.submit', scope);
+                    submit.toggleClass('btn-info', isChecked);
+                    submit.prop('disabled', !isChecked);
+                });
+                scope.on('click', '.submit', function (e) {
+                    var val = {};
+                    var btn = $(e.currentTarget);
+                    var txt = btn.textContent;
+                    var valid = true;
+                    $('[data-f]', scope).addClass('hidden');
+                    $('[name]', scope).each(function (i, e) {
+                        val[e.name] = e.value.toString().trim();
+                    });
+                    $.each(['phone', 'email', 'fname'], function (i, f) {
+                        if (!val[f]) {
+                            valid = false;
+                            $('[data-f="' + f + '"]', scope).removeClass('hidden');
+                        }
+                    });
+                    if (valid === false) {
+                        return;
+                    }
+                    val['url'] = window.location.origin + window.location.pathname;
+                    $.ajax({
+                        url:         '/_popup',
+                        method:      'post',
+                        contentType: 'application/json',
+                        data:        JSON.stringify(val),
+                        beforeSend:  function () {
+                            btn.text('Отправка…');
+                            btn.prop('disabled', true);
+                            btn.removeClass('btn-info');
+                        },
+                        success:     function () {
+                            btn.text(txt);
+                            btn.addClass('btn-info');
+                            $('.alert-info', scope).removeClass('hidden');
+
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 2000);
+                        },
+                        error:       function () {
+                            $('.alert-danger', scope).removeClass('hidden');
+                        }
+                    })
+                });
+            };
+
+            // popup form
+            $('.pop-form').on('click', function (e) {
+                e.preventDefault();
+                var tpl = $('#pop-form-template')[0].innerText;
+                $(e.currentTarget).magnificPopup({
+                    items:          {
+                        src:  tpl,
+                        type: 'inline'
+                    },
+                    preloader:      false,
+                    closeBtnInside: true,
+                    callbacks:      {
+                        open: function () {
+                            hf(this.content);
+                        }
+                    }
+                }).magnificPopup('open');
+            });
+        });
+    </script>
+{% endblock %}

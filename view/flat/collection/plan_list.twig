@@ -1,0 +1,23 @@
+{% for plan, flats in flatPlaned %}
+    <div class="row sub_content">
+        <div class="col-lg-3 col-md-3 col-sm-3">
+            <div class="dividerHeading">
+                <h4><span>Планировка {{ plan }}</span></h4>
+            </div>
+            <div class="recent-item">
+                <div class="touching medium">
+                    <img src="/image/plan-{{ plan }}.jpg" onerror="imageerror(this)">
+                </div>
+                <figcaption class="item-description">
+                    <h5>Площадь: {{ flats[0].area_overall|number_format(2,',') }} м²</h5>
+                </figcaption>
+            </div>
+        </div>
+        <div class="col-lg-9 col-md-9">
+            <div class="dividerHeading">
+                <h4><span>Параметры квартиры</span></h4>
+            </div>
+            {% include "flat/collection/full_list.twig" with {'flatList':flats} %}
+        </div>
+    </div>
+{% endfor %}

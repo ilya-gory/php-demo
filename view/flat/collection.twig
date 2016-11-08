@@ -1,0 +1,233 @@
+{% extends "layout_inner.twig" %}
+
+{% block body_inner %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+
+                {% if flatList|length > 0 %}
+
+                    <div class="row sub_content fltered">
+                        <div class="col-lg-3 col-md-3 col-sm-3">
+                            <div class="dividerHeading">
+                                <h4><span>Тип квартиры</span></h4>
+
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <ul class="pagination pull-left mrgt-0">
+                                    {% for room in filter.rooms|sort %}
+                                        <li>
+                                            <a href="#" data-filter="rooms[]" data-fval="{{ room }}">{{ room }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-5 col-md-5 col-sm-5">
+                            <div class="dividerHeading">
+                                <h4><span>Этаж</span></h4>
+
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <ul class="pagination pull-left mrgt-0">
+                                    {% for floor in filter.floor|sort %}
+                                        <li>
+                                            <a href="#" data-filter="floor[]" data-fval="{{ floor }}">{{ floor }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-4">
+                            <div class="dividerHeading">
+                                <h4><span>Цена</span></h4>
+
+                            </div>
+                            <div class="form-group">
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <input type="text" id="name" name="name" class="form-control" maxlength="100"
+                                           data-msg-required="Введите минимальную стоимость." value=""
+                                           data-finput="price_min"
+                                           placeholder="{{ filter.price_overall.0|number_format(2, ',', ' ') }}">
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <input type="email" id="email" name="email" class="form-control" maxlength="100"
+                                           data-msg-email="Введите максимальную стоимость."
+                                           data-msg-required="Please enter your email address." value=""
+                                           data-finput="price_max"
+                                           placeholder="{{ filter.price_overall.1|number_format(2, ',', ' ') }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul id="myTab" class="nav nav-tabs">
+                        <li class="active"><a href="#1" data-toggle="tab">Список</a></li>
+                        <li class=""><a href="#2" data-toggle="tab">Планировки</a></li>
+                    </ul>
+
+                    <div id="myTabContent" class="tab-content clearfix">
+                        <div class="tab-pane fade active in" id="1">
+                            {% include "flat/collection/full_list.twig" %}
+                        </div>
+                        <div class="tab-pane fade" id="2">
+                            {% include "flat/collection/plan_list.twig" %}
+                        </div>
+                    </div>
+
+                {% else %}
+
+                    <div class="alert alert-info">Объектов пока нет. Пожалуйста, заходите позже.</div>
+
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+        // go
+        $(function () {
+            var $scope = $('.fltered');
+
+            var Filter = function ($container) {
+                this.init($container);
+            };
+
+            Filter.prototype = {
+                mre:                /(.+)\[\]$/,
+                inputTimeout:       null,
+                curl:               {},
+                init:               function ($container) {
+                    this.curl = this.getUrl();
+                    $('a[data-filter]', $container).each(function (i, el) {
+                        var $el = $(el);
+                        $el.on('click', this.clickFilterHandler.bind(this));
+                        this.hlFilter($el);
+                    }.bind(this));
+                    $('input[data-finput]', $container).each(function (i, el) {
+                        var $el = $(el);
+                        $el.on('input', this.inputFilterHandler.bind(this));
+                        this.hlInput($el);
+                    }.bind(this));
+                },
+                getUrl:             function () {
+                    var r1 = /\?(.+)?(#.+)?/;
+                    if (!r1.test(location.href)) {
+                        return {};
+                    }
+                    return location.href.match(r1)[1].split('#')[0].split('&').reduce(function (m, p) {
+                        var _p = p.split('=');
+                        if (!!_p[0]) {
+                            if (this.mre.test(_p[0])) {
+                                var _p0 = this.mre.exec(_p[0])[1];
+                                if (!m[_p0]) {
+                                    m[_p0] = [];
+                                }
+                                m[_p0].push(_p[1] || null);
+                            } else {
+                                m[_p[0]] = _p[1] || null;
+                            }
+                        }
+                        return m;
+                    }.bind(this), {});
+                },
+                goUrl:              function (fname, fval, keep) {
+                    var l = location.pathname;
+                    if (this.mre.test(fname)) {
+                        var _fname = this.mre.exec(fname)[1];
+                        var _fval = this.curl[_fname];
+
+                        if (!_fval) {
+                            _fval = [];
+                        } else if (!Array.isArray(this.curl[_fname])) {
+                            _fval = [_fval];
+                        }
+                        var vidx = _fval.indexOf(fval);
+                        if (vidx === -1) {
+                            _fval.push(fval);
+                        } else {
+                            _fval.splice(vidx, 1);
+                        }
+                        this.curl[_fname] = _fval;
+                    } else if (this.curl[fname] == fval) {
+                        // nothing changed
+                        if (keep === true) {
+                            return;
+                        }
+                        delete this.curl[fname];
+                    } else {
+                        this.curl[fname] = fval;
+                    }
+                    var k = Object.keys(this.curl);
+                    if (k.length > 0) {
+                        var params = k.reduce(function (m, k) {
+                            var par = this.curl[k];
+                            if (!par)
+                                return m;
+                            if (Array.isArray(par)) {
+                                par.forEach(function (pi) {
+                                    m.push(k + '[]=' + pi);
+                                });
+                            } else {
+                                m.push(k + '=' + par);
+                            }
+                            return m;
+                        }.bind(this), []);
+                        if (params.length > 0) {
+                            l += '?' + params.join('&');
+                        }
+                    }
+                    if (!!window.location.hash) {
+                        l += window.location.hash;
+                    }
+                    location.assign(l);
+                },
+                hlFilter:           function ($el) {
+                    var f = $el.data('filter');
+                    var v = $el.data('fval');
+                    var m = this.mre.test(f);
+                    if (m === true) {
+                        f = this.mre.exec(f)[1];
+                    }
+                    if (!this.curl[f]) {
+                        return;
+                    }
+                    $el.closest('li').toggleClass('active', (m ? (this.curl[f].indexOf(v.toString()) !== -1) : this.curl[f] == v));
+                },
+                hlInput:            function ($el) {
+                    var f = $el.data('finput');
+                    if (!this.curl[f]) {
+                        return;
+                    }
+                    $el.val(this.curl[f]);
+                },
+                clickFilterHandler: function (e) {
+                    e.preventDefault();
+                    this.goUrl(e.currentTarget.dataset['filter'], e.currentTarget.dataset['fval']);
+                },
+                inputFilterHandler: function (e) {
+                    if (this.inputTimeout !== null) {
+                        clearTimeout(this.inputTimeout);
+                    }
+                    this.inputTimeout = setTimeout(function () {
+                        this.goUrl(e.currentTarget.dataset['finput'], e.currentTarget.value, true);
+                    }.bind(this), 2000);
+                }
+            };
+            new Filter($scope);
+
+            $(document).on('click.bs.tab', '[data-toggle="tab"]', function (e) {
+                window.location = e.currentTarget.hash + '-tab';
+            });
+
+            var tab = window.location.hash;
+            if (!!tab) {
+                $('[data-toggle="tab"][href="' + tab.replace('-tab', '') + '"]').tab('show');
+            }
+
+        });
+    </script>
+{% endblock %}
