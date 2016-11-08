@@ -5,3 +5,4 @@ Used:
 - mariadb
 - slimphp
 - twig
+- phpoffice.excel (loading flats via xlsx file)
